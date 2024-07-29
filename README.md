@@ -6,7 +6,10 @@ Python3 tool to retrive MP3 sound from a given Youtube video
 Python3, os, logging, subprocess
 
 ````
-pip3 install os logging
+python3 -m venv myenv
+source myenv/bin/activate
+pip install pytube pydub
+python3 youtube2mp3.py 'https://www.youtube.com/watch?v=YOUTUBE_ID' 
 ````
 
 ## How to execute
