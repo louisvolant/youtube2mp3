@@ -9,11 +9,8 @@ BASE_OUTPUT_FILENAME = "output.mp3"
 # execute with
 # python3 -m venv myenv
 # source myenv/bin/activate
-# pip install pytube pydub
 # python3 youtube2mp3.py 'https://www.youtube.com/watch?v=YOUTUBE_ID' 
 
-#from pytube import YouTube
-#from pydub import AudioSegment
 import subprocess
 import argparse
 import logging, re
