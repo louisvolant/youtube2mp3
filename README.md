@@ -1,5 +1,7 @@
-# YoutubeToMp3
-Python3 tool to retrive MP3 sound from a given Youtube video
+# Youtube2Mp3
+Python3 tool to retrieve MP3 sound from a given Youtube video
+
+**You should only retrieve copyright free MP3 sounds**
 
 ## Requirements
 

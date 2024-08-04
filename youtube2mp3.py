@@ -15,9 +15,9 @@ import subprocess
 import argparse
 import logging, re
 
-def sanitize_filename(filename):
+def sanitize_filename(input):
     # Remove invalid characters from filename
-    return re.sub(r'[<>:"/\\|?*]', '', filename)
+    return re.sub(r'[<>:"/\\|?*]', '', input)
 
 def get_youtube_title(url):
     # Define the command to get the title of the YouTube video
@@ -36,7 +36,7 @@ def download_youtube_audio(url, output_path=BASE_OUTPUT_FILENAME, audio_quality=
         '--output', output_path,
         url
     ]
-    
+
     # Run the command
     subprocess.run(command, check=True)
     
@@ -47,6 +47,7 @@ def main():
     parser = argparse.ArgumentParser(description='Download YouTube video audio and convert to MP3.')
     parser.add_argument('url', type=str, help='The URL of the YouTube video')
     #parser.add_argument('output', type=str, nargs='?', default=BASE_OUTPUT_FILENAME, help='The output MP3 file path')
+    # Example : python3 youtube2mp3.py https://www.youtube.com/watch?v=K65eFWaVq3w output_mision_control.mp3
     parser.add_argument('--audio_quality', '-q', default=TARGET_BITRATE, help='The audio quality in kbps (default: 128K)')
 
     args = parser.parse_args()
@@ -56,12 +57,10 @@ def main():
     sanitized_title = sanitize_filename(video_title)
     output_path = f"{sanitized_title}.mp3"
 
-    #logging.info('Processing: {0} and storing to {1}'.format(args.url, args.output))
     logging.info('Processing: {0} and storing to {1}'.format(args.url, output_path))
 
     download_youtube_audio(args.url, output_path, args.audio_quality)
 
-# Example : python3 youtube2mp3.py https://www.youtube.com/watch?v=K65eFWaVq3w output_mision_control.mp3
 
 if __name__ == '__main__':
     ## Initialize logging before hitting main, in case we need extra debuggability
