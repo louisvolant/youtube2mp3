@@ -10,7 +10,7 @@ Python3, os, logging, subprocess
 ````
 python3 -m venv myenv
 source myenv/bin/activate
-pip install pytube pydub
+pip install yt-dlp
 python3 youtube2mp3.py 'https://www.youtube.com/watch?v=YOUTUBE_ID' 
 ````
 

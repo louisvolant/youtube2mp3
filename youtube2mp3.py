@@ -5,15 +5,18 @@ __version__= 1.0
 TARGET_BITRATE = "128K"
 BASE_OUTPUT_FILENAME = "output.mp3"
 
+import subprocess
+import argparse
+import logging, re
+
 # README
 # execute with
 # python3 -m venv myenv
 # source myenv/bin/activate
+# pip install yt-dlp
 # python3 youtube2mp3.py 'https://www.youtube.com/watch?v=YOUTUBE_ID' 
+# Once finished, simply desactivate the virtual environment using "deactivate"
 
-import subprocess
-import argparse
-import logging, re
 
 def sanitize_filename(input):
     # Remove invalid characters from filename
