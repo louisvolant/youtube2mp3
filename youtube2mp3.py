@@ -13,7 +13,7 @@ import logging, re
 # execute with
 # python3 -m venv myenv
 # source myenv/bin/activate
-# pip install yt-dlp
+# pip install -r requirements.txt
 # python3 youtube2mp3.py 'https://www.youtube.com/watch?v=YOUTUBE_ID' 
 # Once finished, simply desactivate the virtual environment using "deactivate"
 
@@ -48,21 +48,29 @@ def download_youtube_audio(url, output_path=BASE_OUTPUT_FILENAME, audio_quality=
 
 def main():
     parser = argparse.ArgumentParser(description='Download YouTube video audio and convert to MP3.')
-    parser.add_argument('url', type=str, help='The URL of the YouTube video')
-    #parser.add_argument('output', type=str, nargs='?', default=BASE_OUTPUT_FILENAME, help='The output MP3 file path')
-    # Example : python3 youtube2mp3.py https://www.youtube.com/watch?v=K65eFWaVq3w output_mision_control.mp3
-    parser.add_argument('--audio_quality', '-q', default=TARGET_BITRATE, help='The audio quality in kbps (default: 128K)')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-u', '--url', type=str, help='The URL of the YouTube video')
+    group.add_argument('-v', '--video_id', type=str, help='The ID of the YouTube video')
+    parser.add_argument('--audio_quality', '-q', default='128K', help='The audio quality in kbps (default: 128K)')
+
+    args = parser.parse_args()
+
+    video_id_or_url = ''
+    if args.url:
+        video_id_or_url = args.url
+    elif args.video_id:
+        video_id_or_url = f"https://www.youtube.com/watch?v={args.video_id}"
 
     args = parser.parse_args()
 
     # Get the video title and sanitize it for use as a filename
-    video_title = get_youtube_title(args.url)
+    video_title = get_youtube_title(video_id_or_url)
     sanitized_title = sanitize_filename(video_title)
     output_path = f"{sanitized_title}.mp3"
 
-    logging.info('Processing: {0} and storing to {1}'.format(args.url, output_path))
+    logging.info('Processing: {0} and storing to {1}'.format(video_id_or_url, output_path))
 
-    download_youtube_audio(args.url, output_path, args.audio_quality)
+    download_youtube_audio(video_id_or_url, output_path, args.audio_quality)
 
 
 if __name__ == '__main__':
