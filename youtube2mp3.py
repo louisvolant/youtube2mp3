@@ -51,7 +51,8 @@ def main():
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-u', '--url', type=str, help='The URL of the YouTube video')
     group.add_argument('-v', '--video_id', type=str, help='The ID of the YouTube video')
-    parser.add_argument('--audio_quality', '-q', default='128K', help='The audio quality in kbps (default: 128K)')
+    parser.add_argument('-q', '--audio_quality', default='128K', help='The audio quality in kbps (default: 128K)')
+    parser.add_argument('-a', '--artist', type=str, help='Artist name to prepend to the filename')
 
     args = parser.parse_args()
 
@@ -66,7 +67,13 @@ def main():
     # Get the video title and sanitize it for use as a filename
     video_title = get_youtube_title(video_id_or_url)
     sanitized_title = sanitize_filename(video_title)
-    output_path = f"{sanitized_title}.mp3"
+
+    # Add artist name to the filename if provided
+    if args.artist:
+        sanitized_artist = sanitize_filename(args.artist)
+        output_path = f"{sanitized_artist} - {sanitized_title}.mp3"
+    else:
+        output_path = f"{sanitized_title}.mp3"
 
     logging.info('Processing: {0} and storing to {1}'.format(video_id_or_url, output_path))
 
