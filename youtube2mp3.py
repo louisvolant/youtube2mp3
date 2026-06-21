@@ -16,6 +16,8 @@ import re
 # python3 -m venv myenv
 # source myenv/bin/activate
 # pip install -r requirements.txt
+# NOTE : if getting HTTP 403 Forbidden from Youtube, execute : pip install -U yt-dlp
+# OR if still not working : python3 -m pip install -U --pre "yt-dlp[default]"
 # python3 youtube2mp3.py -u 'YOUR_YOUTUBE_VIDEO_URL' -n
 # Or with video ID:
 # python3 youtube2mp3.py --video_id 'YOUR_YOUTUBE_VIDEO_ID' -n
@@ -26,14 +28,27 @@ def sanitize_filename(input_str):  # Renamed input to input_str to avoid conflic
     # Remove invalid characters from filename
     if input_str is None:
         return ""
-    return re.sub(r'[<>:"/\\|?*]', '', input_str)
+    # Replace pipes with dashes
+    result = input_str.replace("|", "-")
+    # Remove other invalid filename characters
+    result = re.sub(r'[<>:\"/\\\\?*]', "", result)
+    # Normalize multiple spaces
+    result = re.sub(r"\s+", " ", result)
+    # Normalize multiple dashes/spaces around dashes
+    result = re.sub(r"\s*-\s*-+\s*", " - ", result)
+    return result.strip()
 
 
 def get_youtube_title(url):
     # Define the command to get the title of the YouTube video
-    command = ['yt-dlp', '--get-title', url]
+    command = ['yt-dlp', '--cookies-from-browser', 'chrome', '--get-title', url]
     # Run the command and capture the output
-    result = subprocess.run(command, capture_output=True, text=True, check=True)
+    result = subprocess.run(command, capture_output=True, text=True, check=False)
+    if result.returncode != 0:
+        print(f"❌ yt-dlp failed (code {result.returncode})")
+        print("STDOUT:", result.stdout)
+        print("STDERR:", result.stderr)
+        raise subprocess.CalledProcessError(result.returncode, command, output=result.stdout, stderr=result.stderr)
     return result.stdout.strip()
 
 
@@ -41,9 +56,14 @@ def get_youtube_channel_name(url):
     # Define the command to get the channel name of the YouTube video
     # %(channel)s is a yt-dlp output template for the channel name
     # %(uploader)s can also be used, it might be more general
-    command = ['yt-dlp', '--print', '%(channel)s', url]
+    command = ['yt-dlp', '--cookies-from-browser', 'chrome', '--print', '%(channel)s', url]
     # Run the command and capture the output
-    result = subprocess.run(command, capture_output=True, text=True, check=True)
+    result = subprocess.run(command, capture_output=True, text=True, check=False)
+    if result.returncode != 0:
+        print(f"❌ yt-dlp failed (code {result.returncode})")
+        print("STDOUT:", result.stdout)
+        print("STDERR:", result.stderr)
+        raise subprocess.CalledProcessError(result.returncode, command, output=result.stdout, stderr=result.stderr)
     return result.stdout.strip()
 
 
@@ -51,6 +71,7 @@ def download_youtube_audio(url, output_path=BASE_OUTPUT_FILENAME, audio_quality=
     # Define the command to download and convert the audio
     command = [
         'yt-dlp',
+        '--cookies-from-browser', 'chrome',
         '-x', '--audio-format', 'mp3',
         '--audio-quality', audio_quality,
         '--output', output_path,
