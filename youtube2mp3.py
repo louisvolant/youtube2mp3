@@ -28,6 +28,8 @@ except ImportError as exc:  # pragma: no cover
 # pip install -r requirements.txt
 # NOTE : if getting HTTP 403 Forbidden from Youtube, execute : pip install -U yt-dlp
 # OR if still not working : python3 -m pip install -U --pre "yt-dlp[default]"
+# To fully reset the virtual environment (one-liner):
+# deactivate; rm -rf myenv ; python3 -m venv myenv ; source myenv/bin/activate ; pip install -r requirements.txt
 # python3 youtube2mp3.py -u 'YOUR_YOUTUBE_VIDEO_URL' -n
 # Or with video ID:
 # python3 youtube2mp3.py --video_id 'YOUR_YOUTUBE_VIDEO_ID' -n
@@ -117,6 +119,10 @@ def download_youtube_audio(
         ],
         # Keep original audio container only until MP3 extraction finishes.
         "keepvideo": False,
+        # YouTube now requires a JS challenge solver (EJS) backed by Deno/Node.
+        # This allows yt-dlp to download the solver script from GitHub on first run.
+        # See: https://github.com/yt-dlp/yt-dlp/wiki/EJS
+        "remote_components": ["ejs:github"],
     }
 
     with yt_dlp.YoutubeDL(base_opts) as ydl:
